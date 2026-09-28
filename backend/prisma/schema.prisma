@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("SALES") // ADMIN, SALES, WAREHOUSE, ACCOUNTS
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id           String    @id @default(uuid())
+  name         String
+  mobile       String
+  email        String?
+  businessName String?
+  gstNumber    String?
+  type         String    @default("RETAIL") // RETAIL, WHOLESALE, DISTRIBUTOR
+  address      String?
+  status       String    @default("LEAD") // LEAD, ACTIVE, INACTIVE
+  followUpDate DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  challans Challan[]
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  sku           String   @unique
+  category      String
+  unitPrice     Float
+  stock         Int      @default(0)
+  minStockAlert Int      @default(0)
+  location      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stockMovements StockMovement[]
+  challanItems   ChallanItem[]
+}
+
+model StockMovement {
+  id        String   @id @default(uuid())
+  productId String   
+  quantity  Int
+  type      String   // IN, OUT
+  reason    String?
+  createdBy String
+  timestamp DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Challan {
+  id            String   @id @default(uuid())
+  challanNo     String   @unique
+  customerId    String   
+  totalQuantity Int      @default(0)
+  status        String   @default("DRAFT") // DRAFT, CONFIRMED, CANCELLED
+  createdBy     String
+  timestamp     DateTime @default(now())
+
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  challanItems ChallanItem[]
+}
+
+model ChallanItem {
+  id            String @id @default(uuid())
+  challanId     String 
+  productId     String 
+  quantity      Int
+  snapshotPrice Float
+  snapshotName  String
+
+  challan Challan @relation(fields: [challanId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
