@@ -35,7 +35,7 @@ The application provides a centralized system where users can manage business op
 ## Tech Stack
 
 - **Backend:** Node.js, Express.js, TypeScript, Prisma ORM
-- **Database:** SQLite
+- **Database:** PostgreSQL
 - **Frontend:** React (Vite), TypeScript, Vanilla CSS
 
 ## Getting Started
